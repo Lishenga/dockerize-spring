@@ -265,8 +265,8 @@ ADD ${JAR_FILE} {app_name}.jar
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/{app_name}.jar"]
 ```
 
-## Push to docker hub
-Open a free account on [docker hub](https://hub.docker.com/) 
+
+
 
 
 
