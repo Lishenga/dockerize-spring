@@ -1,4 +1,4 @@
-package com.aws.okodeanyunguusers.entities;
+package com.aws.users.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

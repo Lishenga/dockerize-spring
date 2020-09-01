@@ -1,10 +1,10 @@
-package com.aws.okodeanyunguusers;
+package com.aws.users;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class OkodeAnyunguUsersApplicationTests {
+class UsersApplicationTests {
 
 	@Test
 	void contextLoads() {
