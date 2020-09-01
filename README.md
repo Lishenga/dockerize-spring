@@ -243,29 +243,102 @@ You can find the tutorial on
 
 Dockerizing Springboot applications is quite simple and requires minimal steps, We'll take advantage of the below sample.
 ```docker
-# Start with a base image containing Java runtime/ Replace with respective java version
+# Start with a base image containing Java runtime
 FROM openjdk:8-jdk-alpine
 
 # Add Maintainer Info
-LABEL maintainer="your@email.com"
+LABEL maintainer="adamsokode@gmail.com"
 
 # Add a volume pointing to /tmpe
 VOLUME /tmp
 
-# Make port 8080 available to the world outside this container
+ADD  .  /
+
+# Export environment variables
+RUN export $(cat .env | xargs) # export environment args 
+
+# Build jar
+RUN ./mvnw package
+
+# Make port 8080 available to the world outside this containr
 EXPOSE 8080
 
-# The application's jar file
-ARG JAR_FILE=target/{jar_name}.jar
 
-# Add the application's jar to the container
-ADD ${JAR_FILE} {app_name}.jar
-
-# Run the jar file 
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/{app_name}.jar"]
+# Run the jar file replace jar file with your packaging
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/target/users-0.0.1-SNAPSHOT.jar"]
 ```
 
+### Deployment
+For this step  you need to have both docker and docker compose installed on your server or local computer.
 
+define your docker-compose ochestration file(docker-compose.yml)
+
+```yaml
+services:
+  web:
+    container_name: spring.testapp.application
+    build: .
+    ports:
+      - "8080:8080"
+    env_file: .env
+    depends_on:
+      - mysql
+    networks:
+      local_network:
+        ipv4_address: 172.28.1.4
+
+  mysql:
+    image: mysql:latest
+    container_name: spring.testapp.mysql
+    volumes:
+      - db_data:/var/lib/mysql:rw
+    environment:
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    networks:
+      local_network:
+        ipv4_address: ${DB_HOST}
+    env_file: .env
+
+volumes:
+  db_data:
+
+networks:
+  local_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+```
+If all this is set up then navigate to your project folder within your specific CLI 
+and run 
+
+```bash
+docker-compose up -d --build
+```
+the above command will build and deploy the image to the defined stack in dettached mode, once the container is up and running open http://{ your-ip }:{your-port} to access your application
+
+
+### Remarks
+In this tutorial, we walked through how to containerize a Django web application with MySQL for development. We also created a production-ready Docker Compose file that adds Gunicorn and Nginx into the mix to handle static and media files. You can now test out a production setup locally.
+
+
+For an actual production deployment site:
+- You may want to use a fully managed database service -- like RDS or Cloud SQL -- rather than managing your own MySQL instance within a container.
+- Non-root user for the db
+
+
+To help you manage your docker environment you can install [Portainer][5] a Docker GUI management center.
+
+[5]: https://www.portainer.io/installation/ "Portainer Set up"
+
+Full project to get you started can be found @[repo][7]
+
+[7]: https://github.com/Lishenga/dockerize-spring "DeployingDjango App Inside Docker contain
 
 
 

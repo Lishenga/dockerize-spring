@@ -9,18 +9,15 @@ VOLUME /tmp
 
 ADD  .  /
 
+# Export environment variables
 RUN export $(cat .env | xargs) # export environment args 
 
+# Build jar
 RUN ./mvnw package
 
 # Make port 8080 available to the world outside this containr
 EXPOSE 8080
 
-# # The application's jar file
-# ARG JAR_FILE=target/users-0.0.1-SNAPSHOT.jar
-
-# # Add the application's jar to the container
-# ADD ${JAR_FILE} users.jar
 
 # Run the jar file 
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/target/users-0.0.1-SNAPSHOT.jar"]
